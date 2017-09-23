@@ -2,17 +2,21 @@
 using System.IO;
 using ICSharpCode.NRefactory.CSharp;
 
-
 namespace CodeFormatter
 {
+	/// <summary>
+	/// 引数に渡された*.csファイルをフォーマットし、上書き保存するプログラムです
+	/// </summary>
 	class Program
 	{
 		static void Main(string[] args)
 		{
+			// パラメータチェック
 			if (args.Length <= 0)
 			{
 				return;
 			}
+
 			// コードフォーマットを行うファイル名を引数から取得
 			var targetFileName = args[0];
 			// ファイルが存在しないなら何もしない
@@ -25,7 +29,7 @@ namespace CodeFormatter
 			FormattingOptions.Load();
 
 			// フォーマットを行うソースコードの中身が全て入る
-			var targetSourceCode = "";
+			string targetSourceCode;
 			using (var reader = new StreamReader(targetFileName))
 			{
 				targetSourceCode = reader.ReadToEnd();
@@ -36,32 +40,15 @@ namespace CodeFormatter
 			{
 				return;
 			}
-			/*
-			CompilerSettings a = new CompilerSettings();
-			var parser = new CSharpParser();
 
+			// ソースコードをフォーマットする
+			CSharpFormatter formatter = new CSharpFormatter(FormattingOptions.options);
+			var formatSourceCode = formatter.Format(targetSourceCode);
 
-			var root = parser.Parse(targetSourceCode);
-
-			//			var program = root.Descendants.OfType<ICSharpCode.NRefactory.CSharp.TypeDeclaration>().First();
-			//			program.Name = "Hogegram";
-			var newLineNode = new NewLineNode();
-			newLineNode.NewLineType = ICSharpCode.NRefactory.UnicodeNewline.CRLF;
-			root.Parent.InsertChildBefore(root, newLineNode, Roles.NewLine);
-			root.SetFormattingOptions(FormattingOptions.DefaultOptions);
-
-			Console.WriteLine(root.ToSourceString());
-			using (var writer = new StreamWriter(targetFileName + "new.cs"))
+			// 同じファイル名で出力する
+			using (var writer = new StreamWriter(targetFileName))
 			{
-				writer.Write(root.ToSourceString());
-			}
-			*/
-
-			CSharpFormatter f = new CSharpFormatter(FormattingOptions.DefaultOptions);
-			var dest = f.Format(targetSourceCode);
-			using (var writer = new StreamWriter(targetFileName + "new.cs"))
-			{
-				writer.Write(dest);
+				writer.Write(formatSourceCode);
 			}
 		}
 	}
