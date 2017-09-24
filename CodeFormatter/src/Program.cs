@@ -11,9 +11,6 @@ namespace CodeFormatter
 	{
 		static int Main(string[] args)
 		{
-			Console.WriteLine("");
-			Console.WriteLine("==============================");
-
 			// パラメータチェック
 			if (args.Length <= 0)
 			{
@@ -26,11 +23,11 @@ namespace CodeFormatter
 			// ファイルが存在しないなら何もしない
 			if (!File.Exists(targetFileName))
 			{
-				Console.WriteLine("[FAILURE] : file not found...");
+				Console.WriteLine("[FAILURE] file not found... : " + targetFileName);
 				return 1;
 			}
 
-			// オプションの設定を読み込む
+			// オプションの設定を読み込む + targetFileName
 			FormattingOptions.Load();
 
 			// フォーマットを行うソースコードの中身が全て入る
@@ -43,7 +40,7 @@ namespace CodeFormatter
 			// ソースコードを読み込んだ結果、空っぽの場合は何もせず終了する
 			if (string.IsNullOrEmpty(targetSourceCode))
 			{
-				Console.WriteLine("[FAILURE] : not .cs file...");
+				Console.WriteLine("[FAILURE] not .cs file... : " + targetFileName);
 				return 1;
 			}
 
@@ -56,7 +53,7 @@ namespace CodeFormatter
 			{
 				writer.Write(formatSourceCode);
 			}
-			Console.WriteLine("format... : " + targetFileName);
+			Console.WriteLine("[SUCCESS] format... : " + targetFileName);
 
 			return 0;
 		}
