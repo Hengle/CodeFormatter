@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using ICSharpCode.NRefactory.CSharp;
+using System.Linq;
 
 namespace CodeFormatter
 {
@@ -18,8 +19,17 @@ namespace CodeFormatter
 				return 1;
 			}
 
+			#region TODO コマンドライン引数のパーサーなりを使って解析するようにするべき
+			//参考: http://qiita.com/Marimoiro/items/a090344432a5f69e1fac
+			// オプションのみと　そもそも入っていないの識別
+			args = args.Concat(new string[] { "" }).ToArray();
+			var options = new string[] { "-s", "-o" };
+
+			var result = options.ToDictionary(p => p.Substring(1), p => args.SkipWhile(a => a != p).Skip(1).FirstOrDefault());
+			#endregion
+
 			// コードフォーマットを行うファイル名を引数から取得
-			var targetFileName = args[0];
+			var targetFileName = result["o"];
 			// ファイルが存在しないなら何もしない
 			if (!File.Exists(targetFileName))
 			{
@@ -28,7 +38,7 @@ namespace CodeFormatter
 			}
 
 			// オプションの設定を読み込む + targetFileName
-			FormattingOptions.Load();
+			FormattingOptions.Load(result["s"]);
 
 			// フォーマットを行うソースコードの中身が全て入る
 			string targetSourceCode;
