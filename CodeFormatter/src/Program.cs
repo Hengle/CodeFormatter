@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using ICSharpCode.NRefactory.CSharp;
 
@@ -14,7 +14,7 @@ namespace CodeFormatter
 			// パラメータチェック
 			if (args.Length <= 0)
 			{
-				Console.WriteLine("[FAILURE] : no parameter...");
+				Console.WriteLine("[CodeFormatter FAILURE] : no parameter...");
 				return 1;
 			}
 
@@ -23,7 +23,7 @@ namespace CodeFormatter
 			// ファイルが存在しないなら何もしない
 			if (!File.Exists(targetFileName))
 			{
-				Console.WriteLine("[FAILURE] file not found... : " + targetFileName);
+				Console.WriteLine("[CodeFormatter FAILURE] file not found... : " + targetFileName);
 				return 1;
 			}
 
@@ -40,7 +40,7 @@ namespace CodeFormatter
 			// ソースコードを読み込んだ結果、空っぽの場合は何もせず終了する
 			if (string.IsNullOrEmpty(targetSourceCode))
 			{
-				Console.WriteLine("[FAILURE] not .cs file... : " + targetFileName);
+				Console.WriteLine("[CodeFormatter FAILURE] not .cs file... : " + targetFileName);
 				return 1;
 			}
 
@@ -53,7 +53,7 @@ namespace CodeFormatter
 			{
 				writer.Write(formatSourceCode);
 			}
-			Console.WriteLine("[SUCCESS] format... : " + targetFileName);
+			Console.WriteLine("[CodeFormatter SUCCESS] : " + targetFileName);
 
 			return 0;
 		}
