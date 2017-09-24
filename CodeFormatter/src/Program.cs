@@ -9,20 +9,25 @@ namespace CodeFormatter
 	/// </summary>
 	class Program
 	{
-		static void Main(string[] args)
+		static int Main(string[] args)
 		{
+			Console.WriteLine("");
+			Console.WriteLine("==============================");
+
 			// パラメータチェック
 			if (args.Length <= 0)
 			{
-				return;
+				Console.WriteLine("[FAILURE] : no parameter...");
+				return 1;
 			}
 
 			// コードフォーマットを行うファイル名を引数から取得
 			var targetFileName = args[0];
 			// ファイルが存在しないなら何もしない
-			if(!File.Exists(targetFileName))
+			if (!File.Exists(targetFileName))
 			{
-				return;
+				Console.WriteLine("[FAILURE] : file not found...");
+				return 1;
 			}
 
 			// オプションの設定を読み込む
@@ -38,7 +43,8 @@ namespace CodeFormatter
 			// ソースコードを読み込んだ結果、空っぽの場合は何もせず終了する
 			if (string.IsNullOrEmpty(targetSourceCode))
 			{
-				return;
+				Console.WriteLine("[FAILURE] : not .cs file...");
+				return 1;
 			}
 
 			// ソースコードをフォーマットする
@@ -50,6 +56,9 @@ namespace CodeFormatter
 			{
 				writer.Write(formatSourceCode);
 			}
+			Console.WriteLine("format... : " + targetFileName);
+
+			return 0;
 		}
 	}
 }
