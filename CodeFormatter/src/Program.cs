@@ -23,13 +23,13 @@ namespace CodeFormatter
 			//参考: http://qiita.com/Marimoiro/items/a090344432a5f69e1fac
 			// オプションのみと　そもそも入っていないの識別
 			args = args.Concat(new string[] { "" }).ToArray();
-			var options = new string[] { "-s", "-o" };
+			var options = new string[] { "-settings", "-cs" };
 
 			var result = options.ToDictionary(p => p.Substring(1), p => args.SkipWhile(a => a != p).Skip(1).FirstOrDefault());
 			#endregion
 
 			// コードフォーマットを行うファイル名を引数から取得
-			var targetFileName = result["o"];
+			var targetFileName = result["cs"];
 			// ファイルが存在しないなら何もしない
 			if (!File.Exists(targetFileName))
 			{
@@ -38,7 +38,7 @@ namespace CodeFormatter
 			}
 
 			// オプションの設定を読み込む + targetFileName
-			FormattingOptions.Load(result["s"]);
+			FormattingOptions.Load(result["setting"]);
 
 			// フォーマットを行うソースコードの中身が全て入る
 			string targetSourceCode;
