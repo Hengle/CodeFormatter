@@ -38,7 +38,7 @@ namespace CodeFormatter
 			}
 
 			// オプションの設定を読み込む + targetFileName
-			FormattingOptions.Load(result["setting"]);
+			FormattingOptions.Load(result["settings"]);
 
 			// フォーマットを行うソースコードの中身が全て入る
 			string targetSourceCode;
