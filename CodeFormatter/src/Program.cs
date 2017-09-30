@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using ICSharpCode.NRefactory.CSharp;
 using System.Linq;
+using Mono.Options;
 
 namespace CodeFormatter
 {
@@ -12,46 +13,68 @@ namespace CodeFormatter
 	{
 		static int Main(string[] args)
 		{
-			// パラメータチェック
-			if (args.Length <= 0)
+			string settingsFilePath = null;
+			bool showHelp = false;
+
+			var options = new OptionSet()
 			{
-				Console.WriteLine("[CodeFormatter FAILURE] : no parameter...");
+				{ "s|settings=", "settings file path", v => settingsFilePath = v },
+				{ "h|help", "show help", v => showHelp = (v != null) }
+			};
+			var sourceFileList = options.Parse(args);
+
+			if (showHelp)
+			{
+				ShowUsage(options);
 				return 1;
 			}
 
-			#region TODO コマンドライン引数のパーサーなりを使って解析するようにするべき
-			//参考: http://qiita.com/Marimoiro/items/a090344432a5f69e1fac
-			// オプションのみと　そもそも入っていないの識別
-			args = args.Concat(new string[] { "" }).ToArray();
-			var options = new string[] { "-settings", "-cs" };
-
-			var result = options.ToDictionary(p => p.Substring(1), p => args.SkipWhile(a => a != p).Skip(1).FirstOrDefault());
-			#endregion
-
-			// コードフォーマットを行うファイル名を引数から取得
-			var targetFileName = result["cs"];
-			// ファイルが存在しないなら何もしない
-			if (!File.Exists(targetFileName))
+			// オプションの設定を読み込む
+			if (string.IsNullOrEmpty(settingsFilePath))
 			{
-				Console.WriteLine("[CodeFormatter FAILURE] file not found... : " + targetFileName);
-				return 1;
+				FormattingOptions.Load();
+			}
+			else
+			{
+				FormattingOptions.Load(settingsFilePath);
 			}
 
-			// オプションの設定を読み込む + targetFileName
-			FormattingOptions.Load(result["settings"]);
+			// フォーマットに失敗したファイルが一つでもあればtrueとなる
+			bool formatFailure = false;
+			foreach (var source in sourceFileList)
+			{
+				if (!File.Exists(source))
+				{
+					Console.WriteLine("[CodeFormatter FAILURE] file not found... : " + source);
+					formatFailure = true;
+					continue;
+				}
+				if (System.IO.Path.GetExtension(source) != ".cs")
+				{
+					Console.WriteLine("[CodeFormatter FAILURE] unsupported file... : " + source);
+					formatFailure = true;
+					continue;
+				}
 
-			// フォーマットを行うソースコードの中身が全て入る
+				Format(source);
+
+				Console.WriteLine("[CodeFormatter SUCCESS] : " + source);
+			}
+
+			return (formatFailure) ? 1 : 0;
+		}
+
+		/// <summary>
+		/// 実際にフォーマットを行う
+		/// </summary>
+		/// <param name="path">フォーマットするファイルへのパス</param>
+		private static void Format(string path)
+		{
+			// フォーマットを行うソースコードを全て読み込む
 			string targetSourceCode;
-			using (var reader = new StreamReader(targetFileName))
+			using (var reader = new StreamReader(path))
 			{
 				targetSourceCode = reader.ReadToEnd();
-			}
-
-			// ソースコードを読み込んだ結果、空っぽの場合は何もせず終了する
-			if (string.IsNullOrEmpty(targetSourceCode))
-			{
-				Console.WriteLine("[CodeFormatter FAILURE] not .cs file... : " + targetFileName);
-				return 1;
 			}
 
 			// ソースコードをフォーマットする
@@ -59,13 +82,18 @@ namespace CodeFormatter
 			var formatSourceCode = formatter.Format(targetSourceCode);
 
 			// 同じファイル名で出力する
-			using (var writer = new StreamWriter(targetFileName))
+			using (var writer = new StreamWriter(path))
 			{
 				writer.Write(formatSourceCode);
 			}
-			Console.WriteLine("[CodeFormatter SUCCESS] : " + targetFileName);
+		}
 
-			return 0;
+		// Uasgeを表示する
+		private static void ShowUsage(OptionSet p)
+		{
+			Console.Error.WriteLine("Usage:CodeFormatter [OPTIONS] SOURCE...");
+			Console.Error.WriteLine();
+			p.WriteOptionDescriptions(Console.Out);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using ICSharpCode.NRefactory.CSharp;
 
@@ -38,7 +38,7 @@ namespace CodeFormatter
 				// ファイルが存在しない場合は新規作成する
 				Save(filePath);
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 
 			}
