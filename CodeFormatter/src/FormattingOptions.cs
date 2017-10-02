@@ -31,16 +31,11 @@ namespace CodeFormatter
 					//XMLファイルから読み込み、逆シリアル化する
 					options = (CSharpFormattingOptions)serializer.Deserialize(reader);
 				}
-				throw new ArgumentNullException();
 			}
 			catch (FileNotFoundException)
 			{
 				// ファイルが存在しない場合は新規作成する
 				Save(filePath);
-			}
-			catch (Exception)
-			{
-
 			}
 		}
 

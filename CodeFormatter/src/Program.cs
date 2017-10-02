@@ -56,9 +56,16 @@ namespace CodeFormatter
 					continue;
 				}
 
-				Format(source);
-
-				Console.WriteLine("[CodeFormatter SUCCESS] : " + source);
+				try
+				{
+					Format(source);
+					Console.WriteLine("[CodeFormatter SUCCESS] : " + source);
+				}
+				catch (Exception e)
+				{
+					Console.Error.WriteLine("[CodeFormatter FAILURE]" + e.Message + " : " + source);
+					Console.Error.WriteLine(e.StackTrace);
+				}
 			}
 
 			return (formatFailure) ? 1 : 0;
